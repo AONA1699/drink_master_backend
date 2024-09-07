@@ -1,0 +1,7 @@
+# Activa la reescritura de URL
+RewriteEngine On
+
+# Redirige las peticiones de URL sin la extensión .php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ $1.php [L]

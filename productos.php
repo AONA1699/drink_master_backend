@@ -2,10 +2,10 @@
 require 'config.php';
 require 'jwt.php';  // Aquí puedes agregar las funciones para generar y validar el JWT manualmente o con una librería
 
-function getProductosConDetalles() {
+function getProductosConDetalles($categoria_id = null) {
     global $pdo;
 
-    // Consulta SQL para obtener los detalles del producto
+    // Base de la consulta SQL
     $query = "
         SELECT 
             p.id AS producto_id,
@@ -17,8 +17,19 @@ function getProductosConDetalles() {
         LEFT JOIN imagenes i ON p.id = i.id_product
         LEFT JOIN stock s ON p.id = s.id_produc
     ";
-    
+
+    // Si se pasa un `categoria_id`, agregar la condición WHERE
+    if ($categoria_id !== null) {
+        $query .= " WHERE p.categoria_id = :categoria_id";
+    }
+
     $stmt = $pdo->prepare($query);
+
+    // Asignar el valor de `categoria_id` si está presente
+    if ($categoria_id !== null) {
+        $stmt->bindParam(':categoria_id', $categoria_id, PDO::PARAM_INT);
+    }
+
     $stmt->execute();
 
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -55,9 +66,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         exit();
     }
 
-    // Si el token es válido, retornar la lista de productos
-    $response = getProductosConDetalles();
+    // Obtener el valor del parámetro `categoria` si está presente
+    $categoria_id = isset($_GET['categoria']) ? intval($_GET['categoria']) : null;
+
+    // Si el token es válido, retornar la lista de productos con o sin filtro de categoría
+    $response = getProductosConDetalles($categoria_id);
     header('Content-Type: application/json');
     echo json_encode($response);
 }
-?>

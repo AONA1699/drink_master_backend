@@ -1,4 +1,6 @@
 <?php
+
+include_once 'headers.php';
 // Configuración de conexión a la base de datos
 $host = 'localhost'; // Cambia esto por la dirección de tu servidor de base de datos
 $db = 'licoreria_db'; // Cambia por el nombre de tu base de datos
